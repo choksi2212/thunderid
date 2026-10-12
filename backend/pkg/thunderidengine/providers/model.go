@@ -708,6 +708,14 @@ type User struct {
 	Attributes json.RawMessage `json:"attributes,omitempty"`
 	Display    string          `json:"display,omitempty"`
 	IsReadOnly bool            `json:"isReadOnly"`
+	// LinkedAccount, set on create, records the user's linked account in the same write.
+	LinkedAccount *LinkedAccount `json:"-"`
+}
+
+// LinkedAccount names a subject at a connection.
+type LinkedAccount struct {
+	IdpID string
+	Sub   string
 }
 
 // Agent is the service-level model for agent create operations.
@@ -716,7 +724,6 @@ type Agent struct {
 	OUID        string          `json:"ouId"`
 	OUHandle    string          `json:"ouHandle,omitempty"`
 	Type        string          `json:"type"`
-	Name        string          `json:"name"`
 	Description string          `json:"description,omitempty"`
 	LogoURL     string          `json:"logoUrl,omitempty"`
 	Owner       string          `json:"owner,omitempty"`
@@ -773,6 +780,9 @@ type Entity struct {
 	Attributes       json.RawMessage `json:"attributes,omitempty"`
 	SystemAttributes json.RawMessage `json:"systemAttributes,omitempty"`
 	IsReadOnly       bool            `json:"isReadOnly"`
+	// Display is the value of the entity type's display attribute, falling back to the entity ID.
+	// It is populated only by callers that resolve it, such as the actor provider for agents.
+	Display string `json:"display,omitempty"`
 }
 
 // EntityGroup represents a group with basic information for entity group membership queries.
@@ -816,10 +826,10 @@ type UserTypeAttributeMapping struct {
 	Attributes []AttributeMapping `json:"attributes,omitempty" yaml:"attributes,omitempty"`
 }
 
-// AccountLinking configures which attributes resolve the local user for an incoming federated
-// identity when the subject identifier does not. Attributes is a list of external claim names (each
-// resolved to its local counterpart via the IdP's attribute mappings); those with a value are matched
-// together to resolve a unique local user.
+// AccountLinking configures which attributes name an existing local user for an incoming federated
+// identity that has no recorded link. Attributes is a list of external claim names. Each one matches
+// on every local attribute the IdP's attribute mappings copy it to and on the local attribute of the
+// same name; every attribute with a value must match.
 type AccountLinking struct {
 	Attributes []string `json:"attributes,omitempty" yaml:"attributes,omitempty"`
 }
