@@ -50,7 +50,7 @@ func newCIMDService() CIMDServiceInterface {
 		// are never followed: the fetcher must see the 3xx to reject a
 		// document served behind one.
 		httpClient: syshttp.NewHTTPClient(syshttp.HTTPClientConfig{
-			GuardSSRF:       true,
+			GuardSSRF:        true,
 			DisableRedirects: true,
 		}),
 		logger: log.GetLogger().With(log.String(log.LoggerKeyComponentName, "CIMDService")),
